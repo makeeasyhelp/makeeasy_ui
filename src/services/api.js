@@ -2,7 +2,7 @@
  * API service to communicate with the backend
  */
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:5050/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
 
 /**
  * Configure API auth token and local storage
