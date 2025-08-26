@@ -1,8 +1,9 @@
 /**
  * API service to communicate with the backend
  */
+import { API_BASE_URL } from '../config/apiConfig';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 /**
  * Configure API auth token and local storage
