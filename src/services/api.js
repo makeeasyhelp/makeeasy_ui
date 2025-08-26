@@ -2,7 +2,7 @@
  * API service to communicate with the backend
  */
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:5050/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050/api';
 
 /**
  * Configure API auth token and local storage
@@ -54,18 +54,34 @@ const getHeaders = (includeAuth = true) => {
  * Handle API responses and errors
  */
 const handleResponse = async (response) => {
-  const data = await response.json();
-  
-  if (!response.ok) {
-    // Handle specific error cases
-    if (response.status === 401) {
-      // Clear auth token on unauthorized
-      setAuthToken(null);
+  try {
+    const data = await response.json();
+    
+    if (!response.ok) {
+      // Handle specific error cases
+      if (response.status === 401) {
+        // Clear auth token on unauthorized
+        setAuthToken(null);
+      }
+      
+      // Enhanced error handling with status codes
+      const error = new Error(data.error || 'Something went wrong');
+      error.status = response.status;
+      error.response = {
+        status: response.status,
+        statusText: response.statusText,
+        data: data
+      };
+      throw error;
     }
-    throw new Error(data.error || 'Something went wrong');
-  }
 
-  return data;
+    return data;
+  } catch (error) {
+    if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+      throw new Error('Unable to connect to the server. Please check your internet connection.');
+    }
+    throw error;
+  }
 };
 
 /**
