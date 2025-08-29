@@ -17,6 +17,16 @@ body {
   min-height: 100vh;
 }
 
+/* Hide scrollbar for mobile horizontal scrolling containers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Animated cursor */
 .animated-cursor {
   cursor: url('https://cdn.jsdelivr.net/gh/saadeghi/files@main/cursor/cursor1.cur'), auto;
@@ -85,6 +95,19 @@ body {
 @keyframes bounce-subtle {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
+}
+
+@keyframes categoriesAutoScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animated-categories-scroll {
+  animation: categoriesAutoScroll 30s linear infinite;
+}
+
+.animated-categories-scroll.paused {
+  animation-play-state: paused;
 }
 
 /* Utility classes */
