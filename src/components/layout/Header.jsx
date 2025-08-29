@@ -65,16 +65,18 @@ const Header = ({ activePage }) => {
           ? 'bg-white/95 backdrop-blur-md shadow-md border-b'
           : 'bg-white/70 backdrop-blur'
       }`}
+      style={{ minHeight: '56px' }}
     >
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+      <div className="px-2 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0 flex items-center">
             <img
               src={newLogo}
               alt="MakeEasy Logo"
-              className="h-10 w-auto"
+              className="h-9 w-auto md:h-10"
               onError={handleLogoError}
+              style={{ maxWidth: '120px' }}
             />
           </Link>
 
@@ -91,26 +93,23 @@ const Header = ({ activePage }) => {
                 } group`}
               >
                 {link.name}
-                {/* Hover underline */}
                 <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-brand-indigo transition-all duration-300 group-hover:w-full"></span>
               </button>
             ))}
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-3 relative">
+          <div className="flex items-center space-x-2 md:space-x-3 relative">
             {isLoggedIn ? (
               <div
                 className="relative"
                 onMouseEnter={() => setShowDropdown(true)}
                 onMouseLeave={() => setShowDropdown(false)}
               >
-                <button className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200">
-                  <User size={18} />
+                <button className="flex items-center gap-2 px-2 py-2 rounded-md bg-gray-100 hover:bg-gray-200 md:px-3">
+                  <User size={20} />
                   <span className="hidden sm:inline text-sm font-medium">{user?.name}</span>
                 </button>
-
-                {/* Dropdown */}
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 border animate-fadeIn">
                     <button
@@ -145,7 +144,7 @@ const Header = ({ activePage }) => {
                 onClick={() => navigate('/login')}
                 className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
               >
-                <User size={18} />
+                <User size={20} />
               </button>
             )}
 
@@ -153,15 +152,16 @@ const Header = ({ activePage }) => {
               onClick={() => navigate('/cart')}
               className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
             >
-              <ShoppingCart size={18} />
+              <ShoppingCart size={20} />
             </button>
 
             {/* Mobile Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-md hover:bg-gray-100"
+              aria-label="Open menu"
             >
-              {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -173,8 +173,17 @@ const Header = ({ activePage }) => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="md:hidden bg-white/95 backdrop-blur-md border-t px-4 py-3 space-y-2"
+          className="md:hidden fixed top-0 left-0 w-full h-full bg-white/98 backdrop-blur-lg border-t z-40 px-4 py-6 space-y-2 flex flex-col"
+          style={{ minHeight: '100vh' }}
         >
+          <div className="flex justify-between items-center mb-6">
+            <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+              <img src={newLogo} alt="MakeEasy Logo" className="h-9 w-auto" />
+            </Link>
+            <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-md hover:bg-gray-100">
+              <X size={24} />
+            </button>
+          </div>
           {navLinks.map(link => (
             <button
               key={link.name}
@@ -182,7 +191,7 @@ const Header = ({ activePage }) => {
                 navigate(link.path);
                 setMobileMenuOpen(false);
               }}
-              className={`block w-full text-left py-2 text-sm rounded-md ${
+              className={`block w-full text-left py-3 text-base rounded-md ${
                 activePage === link.name
                   ? 'text-brand-indigo bg-indigo-50'
                   : 'text-gray-700'
@@ -198,7 +207,7 @@ const Header = ({ activePage }) => {
                   navigate('/profile');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-2 text-left rounded-md text-sm hover:bg-gray-100"
+                className="w-full py-3 text-left rounded-md text-base hover:bg-gray-100"
               >
                 Profile
               </button>
@@ -207,7 +216,7 @@ const Header = ({ activePage }) => {
                   navigate('/orders');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-2 text-left rounded-md text-sm hover:bg-gray-100"
+                className="w-full py-3 text-left rounded-md text-base hover:bg-gray-100"
               >
                 Orders
               </button>
@@ -216,7 +225,7 @@ const Header = ({ activePage }) => {
                   navigate('/services');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-2 text-left rounded-md text-sm hover:bg-gray-100"
+                className="w-full py-3 text-left rounded-md text-base hover:bg-gray-100"
               >
                 Your Services
               </button>
@@ -225,7 +234,7 @@ const Header = ({ activePage }) => {
                   handleLogout();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-2 text-center rounded-md text-sm font-medium bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white"
+                className="w-full py-3 text-center rounded-md text-base font-medium bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white"
               >
                 Logout
               </button>
@@ -236,7 +245,7 @@ const Header = ({ activePage }) => {
                 navigate('/login');
                 setMobileMenuOpen(false);
               }}
-              className="w-full py-2 text-center rounded-md text-sm font-medium bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white"
+              className="w-full py-3 text-center rounded-md text-base font-medium bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white"
             >
               Login
             </button>
