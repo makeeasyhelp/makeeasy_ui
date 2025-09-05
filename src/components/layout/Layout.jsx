@@ -83,6 +83,7 @@ const Layout = () => {
           <button onClick={() => navigate('/admin/products')} className="text-brand-indigo whitespace-nowrap">Products</button>
           <button onClick={() => navigate('/admin/categories')} className="text-brand-indigo whitespace-nowrap">Categories</button>
           <button onClick={() => navigate('/admin/services')} className="text-brand-indigo whitespace-nowrap">Services</button>
+          <button onClick={() => navigate('/admin/about')} className="text-brand-indigo whitespace-nowrap">About</button>
           <button
             onClick={handleAdminLogout}
             className="flex items-center gap-1 text-red-500 font-semibold ml-auto"

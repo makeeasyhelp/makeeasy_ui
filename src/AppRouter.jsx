@@ -17,6 +17,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsCRUDPage from './pages/admin/AdminProductsCRUDPage';
 import AdminCategoriesCRUDPage from './pages/admin/AdminCategoriesCRUDPage';
 import AdminServicesCRUDPage from './pages/admin/AdminServicesCRUDPage';
+import AdminAboutCRUDPage from './pages/admin/AdminAboutCRUDPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function AppRouter() {
@@ -84,6 +85,14 @@ function AppRouter() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminServicesCRUDPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/about" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminAboutCRUDPage />
               </ProtectedRoute>
             } 
           />
