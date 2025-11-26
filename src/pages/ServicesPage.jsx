@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 import { servicesAPI, productsAPI } from '../services/api';
 import Icon from '../components/ui/Icon';
 import newLogo from '../assets/newwlogo.png';
 
 const ServicesPage = () => {
+  const navigate = useNavigate();
+  const { addToCart } = useApp();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [services, setServices] = useState([]);
@@ -47,12 +51,26 @@ const ServicesPage = () => {
         item.location?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleBookNow = (service) => {
-    alert(`Book Now for ${service.title}`);
+  const handleBookNow = (item) => {
+    // Format item for cart
+    const cartItem = {
+      id: item._id || item.id,
+      name: item.title || item.name,
+      price: item.price,
+      image: item.image || item.icon, // Use icon if image not available
+      type: item.icon ? 'service' : 'product', // Distinguish between service and product
+      serviceId: item.icon ? (item._id || item.id) : undefined,
+      productId: !item.icon ? (item._id || item.id) : undefined
+    };
+
+    addToCart(cartItem);
+    navigate('/cart');
   };
 
   const handleLearnMore = (service) => {
-    alert(`Learn more about ${service.title}`);
+    // For now, treat learn more as book now or navigate to details
+    // But since we want to book, let's just book it
+    handleBookNow(service);
   };
 
   if (loading) {
@@ -124,19 +142,18 @@ const ServicesPage = () => {
           {["all", "home-services", "professional"].map((cat) => (
             <button
               key={cat}
-              className={`flex-shrink-0 px-4 py-2 rounded-full transition-all text-sm sm:text-base ${
-                activeCategory === cat
+              className={`flex-shrink-0 px-4 py-2 rounded-full transition-all text-sm sm:text-base ${activeCategory === cat
                   ? "bg-brand-indigo text-white shadow-md"
                   : "bg-white hover:bg-gray-100 text-gray-700"
-              }`}
+                }`}
               onClick={() => setActiveCategory(cat)}
               aria-label={`Show ${cat}`}
             >
               {cat === "all"
                 ? "All"
                 : cat === "home-services"
-                ? "Home Services"
-                : "Professional"}
+                  ? "Home Services"
+                  : "Professional"}
             </button>
           ))}
         </div>
@@ -166,7 +183,7 @@ const ServicesPage = () => {
                   className="mt-4 px-5 py-2 text-sm sm:text-base bg-brand-indigo/10 text-brand-indigo font-medium rounded-full hover:bg-brand-indigo hover:text-white transition-all"
                   onClick={() => handleLearnMore(service)}
                 >
-                  Learn More
+                  Book Now
                 </button>
               </div>
             ))

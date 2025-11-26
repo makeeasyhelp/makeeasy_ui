@@ -8,7 +8,11 @@ import ImprovedProductDetailsPage from './pages/ImprovedProductDetailsPage';
 import ServicesPage from './pages/ServicesPage';
 import ContactPage from './pages/ContactPage';
 import LoginRegisterPage from './pages/auth/LoginRegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import UpdatedProfilePage from './pages/UpdatedProfilePage';
+import EnhancedProfilePage from './pages/EnhancedProfilePage';
+import OrdersPage from './pages/OrdersPage';
+import UserServicesPage from './pages/UserServicesPage';
 import CartPage from './pages/CartPage';
 import ImprovedCheckoutPage from './pages/ImprovedCheckoutPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -18,6 +22,7 @@ import AdminProductsCRUDPage from './pages/admin/AdminProductsCRUDPage';
 import AdminCategoriesCRUDPage from './pages/admin/AdminCategoriesCRUDPage';
 import AdminServicesCRUDPage from './pages/admin/AdminServicesCRUDPage';
 import AdminAboutCRUDPage from './pages/admin/AdminAboutCRUDPage';
+import AdminManageUsersPage from './pages/admin/AdminManageUsersPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function AppRouter() {
@@ -33,6 +38,7 @@ function AppRouter() {
           <Route path="services" element={<ServicesPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="login" element={<LoginRegisterPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="checkout/:bookingId" element={<ImprovedCheckoutPage />} />
           <Route path="checkout" element={<ImprovedCheckoutPage />} />
           
@@ -41,7 +47,23 @@ function AppRouter() {
             path="profile" 
             element={
               <ProtectedRoute>
-                <UpdatedProfilePage />
+                <EnhancedProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="orders" 
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user-services" 
+            element={
+              <ProtectedRoute>
+                <UserServicesPage />
               </ProtectedRoute>
             } 
           />
@@ -61,6 +83,14 @@ function AppRouter() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/users" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminManageUsersPage />
               </ProtectedRoute>
             } 
           />
