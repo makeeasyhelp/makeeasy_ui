@@ -185,6 +185,35 @@ export const authAPI = {
 
     return await handleResponse(response);
   },
+
+  googleAuth: async (userData) => {
+    const response = await fetch(`${API_URL}/auth/google`, {
+      method: 'POST',
+      headers: getHeaders(false),
+      body: JSON.stringify(userData),
+    });
+
+    const data = await handleResponse(response);
+
+    if (data.token) {
+      setToken(data.token);
+    }
+
+    return data;
+  },
+
+  uploadProfileImage: async (formData) => {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/auth/upload-profile-image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      },
+      body: formData, // Don't set Content-Type, let browser set it with boundary
+    });
+
+    return await handleResponse(response);
+  },
 };
 
 /**
@@ -565,6 +594,166 @@ export const usersAPI = {
   },
 };
 
+/**
+ * Banners API calls
+ */
+export const bannersAPI = {
+  // Get active banners (public)
+  getActiveBanners: async () => {
+    const response = await fetch(`${API_URL}/banners/active`, {
+      headers: getHeaders(false),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all banners (admin)
+  getAllBanners: async () => {
+    const response = await fetch(`${API_URL}/banners/all`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get banner by ID (admin)
+  getBannerById: async (id) => {
+    const response = await fetch(`${API_URL}/banners/${id}`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Create banner (admin)
+  createBanner: async (bannerData) => {
+    const response = await fetch(`${API_URL}/banners`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(bannerData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Update banner (admin)
+  updateBanner: async (id, bannerData) => {
+    const response = await fetch(`${API_URL}/banners/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(bannerData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Delete banner (admin)
+  deleteBanner: async (id) => {
+    const response = await fetch(`${API_URL}/banners/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Toggle banner status (admin)
+  toggleBannerStatus: async (id) => {
+    const response = await fetch(`${API_URL}/banners/${id}/toggle`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Update banner order (admin)
+  updateBannerOrder: async (banners) => {
+    const response = await fetch(`${API_URL}/banners/reorder/batch`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ banners }),
+    });
+    return await handleResponse(response);
+  },
+};
+
+/**
+ * Locations API calls
+ */
+export const locationsAPI = {
+  // Get active locations (public)
+  getActiveLocations: async () => {
+    const response = await fetch(`${API_URL}/locations/active`, {
+      headers: getHeaders(false),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all locations (admin)
+  getAllLocations: async () => {
+    const response = await fetch(`${API_URL}/locations/all`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get states list
+  getStates: async () => {
+    const response = await fetch(`${API_URL}/locations/states`, {
+      headers: getHeaders(false),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get locations by state
+  getLocationsByState: async (state) => {
+    const response = await fetch(`${API_URL}/locations/state/${state}`, {
+      headers: getHeaders(false),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get location by ID (admin)
+  getLocationById: async (id) => {
+    const response = await fetch(`${API_URL}/locations/${id}`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Create location (admin)
+  createLocation: async (locationData) => {
+    const response = await fetch(`${API_URL}/locations`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(locationData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Update location (admin)
+  updateLocation: async (id, locationData) => {
+    const response = await fetch(`${API_URL}/locations/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(locationData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Delete location (admin)
+  deleteLocation: async (id) => {
+    const response = await fetch(`${API_URL}/locations/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Toggle location status (admin)
+  toggleLocationStatus: async (id) => {
+    const response = await fetch(`${API_URL}/locations/${id}/toggle`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+};
+
 export default {
   setAuthToken,
   auth: authAPI,
@@ -575,4 +764,6 @@ export default {
   orders: ordersAPI,
   cart: cartAPI,
   users: usersAPI,
+  banners: bannersAPI,
+  locations: locationsAPI,
 };

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { AnimatePresence, motion } from 'framer-motion';
-import { productsAPI, categoriesAPI, servicesAPI } from '../services/api';
+import { productsAPI, categoriesAPI, servicesAPI, bannersAPI } from '../services/api';
+import BannerCarousel from '../components/BannerCarousel';
 
-const SearchForm = ({ isVisible, onClose, onSearch, searchInput, setSearchInput, searchCategory, setSearchCategory, searchLocation, setSearchLocation, categories }) => {
+const SearchModal = ({ isVisible, onClose, onSearch, searchInput, setSearchInput, searchCategory, setSearchCategory, searchLocation, setSearchLocation, categories }) => {
     if (!isVisible) return null;
 
     return (
@@ -14,7 +15,7 @@ const SearchForm = ({ isVisible, onClose, onSearch, searchInput, setSearchInput,
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex justify-center items-start p-4"
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-start p-4"
                     onClick={onClose}
                 >
                     <motion.div
@@ -22,46 +23,80 @@ const SearchForm = ({ isVisible, onClose, onSearch, searchInput, setSearchInput,
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -50, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        className="bg-white rounded-xl p-4 shadow-xl w-full max-w-md mt-16"
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mt-20"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex flex-col gap-3">
-                            <input
-                                type="text"
-                                placeholder="What are you looking for?"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo text-sm md:text-base"
-                                value={searchInput}
-                                onChange={e => setSearchInput(e.target.value)}
-                                aria-label="Search products or services"
-                            />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <select
-                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo text-sm md:text-base"
-                                    value={searchCategory}
-                                    onChange={e => setSearchCategory(e.target.value)}
-                                    aria-label="Select category"
-                                >
-                                    <option value="">All Categories</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.key} value={cat.key}>{cat.name}</option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="text"
-                                    placeholder="Location"
-                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo text-sm md:text-base"
-                                    value={searchLocation}
-                                    onChange={e => setSearchLocation(e.target.value)}
-                                    aria-label="Location"
-                                />
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-gray-900">Search Products & Services</h3>
+                                <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                    <Icon name="X" size={24} />
+                                </button>
                             </div>
-                            <button
-                                className="bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white px-4 py-3 rounded-lg font-medium hover:opacity-95 transition-opacity shadow-button text-sm md:text-base"
-                                onClick={onSearch}
-                                aria-label="Search"
-                            >
-                                Search Now
-                            </button>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">What are you looking for?</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Search for products, services..."
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
+                                        value={searchInput}
+                                        onChange={e => setSearchInput(e.target.value)}
+                                        autoFocus
+                                    />
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                        <select
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
+                                            value={searchCategory}
+                                            onChange={e => setSearchCategory(e.target.value)}
+                                        >
+                                            <option value="">All Categories</option>
+                                            {categories.map(cat => (
+                                                <option key={cat.key} value={cat.key}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter location"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
+                                            value={searchLocation}
+                                            onChange={e => setSearchLocation(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                {/* Popular Searches */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">Popular Searches</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Bed', 'Washing Machine', 'Fridge', 'Air Conditioner', 'Mattress', 'TV', 'IPhone', 'Sofa'].map(tag => (
+                                            <button
+                                                key={tag}
+                                                onClick={() => setSearchInput(tag)}
+                                                className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-brand-indigo hover:text-white transition-all"
+                                            >
+                                                🔥 {tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <button
+                                    className="w-full bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white px-6 py-3 rounded-lg font-semibold hover:opacity-95 transition-opacity shadow-lg"
+                                    onClick={onSearch}
+                                >
+                                    Search
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -78,25 +113,40 @@ const HomePage = () => {
     const [categories, setCategories] = useState([]);
     const [services, setServices] = useState([]);
     const [featuredListings, setFeaturedListings] = useState([]);
+    const [banners, setBanners] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [activeServiceTab, setActiveServiceTab] = useState('Popular');
     const [isCategoriesPaused, setIsCategoriesPaused] = useState(false);
+    const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+
+    const placeholderTexts = [
+        "Bed",
+        "Washing Machine",
+        "Fridge",
+        "Air Conditioner",
+        "Mattress",
+        "TV",
+        "iPhone",
+        "Sofa"
+    ];
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const [categoriesRes, servicesRes, productsRes] = await Promise.all([
+                const [categoriesRes, servicesRes, productsRes, bannersRes] = await Promise.all([
                     categoriesAPI.getCategories(),
                     servicesAPI.getServices(),
-                    productsAPI.getFeaturedProducts()
+                    productsAPI.getFeaturedProducts(),
+                    bannersAPI.getActiveBanners()
                 ]);
 
                 if (categoriesRes.success) setCategories(categoriesRes.data);
                 if (servicesRes.success) setServices(servicesRes.data);
                 if (productsRes.success) setFeaturedListings(productsRes.data);
+                if (bannersRes.success) setBanners(bannersRes.data);
             } catch (err) {
                 setError(err.message || 'Failed to fetch data');
                 console.error('Error fetching data:', err);
@@ -106,6 +156,17 @@ const HomePage = () => {
         };
 
         fetchData();
+    }, []);
+
+    // Rotating placeholder effect
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentPlaceholderIndex((prevIndex) => 
+                (prevIndex + 1) % placeholderTexts.length
+            );
+        }, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleSearch = () => {
@@ -125,114 +186,67 @@ const HomePage = () => {
 
     return (
         <>
-            {/* Hero Section */}
+            {/* Hero Section with Dynamic Carousel Background */}
             <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="text-white py-10 md:py-16 bg-gradient-to-br from-brand-indigo via-brand-purple to-brand-pink relative overflow-hidden"
+                className="text-white relative overflow-hidden min-h-[600px] md:min-h-[700px]"
             >
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none"></div>
-                <div className="text-center px-4 relative z-10 max-w-5xl mx-auto">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1, duration: 0.4 }}
-                        className="text-5xl md:text-7xl font-extrabold mb-3 md:mb-6 leading-tight tracking-tight"
-                    >
-                        make<span className="text-brand-lightBlue"></span>easy
-                    </motion.h1>
-                    <motion.h2
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.4 }}
-                        className="text-2xl md:text-4xl font-bold mb-3 md:mb-6 leading-tight tracking-tight"
-                    >
-                        Rent Anything, Book Any Service
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.4 }}
-                        className="text-base md:text-xl mb-6 md:mb-10 opacity-90"
-                    >
-                        Your one-stop marketplace for rentals and services
-                    </motion.p>
-                    
-                    {/* Search Section */}
-                    <div className="relative z-10">
-                        {/* Mobile Search Button */}
-                        <motion.button
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.4 }}
-                            onClick={toggleSearch}
-                            className="md:hidden bg-white text-brand-indigo w-full py-3 px-4 rounded-lg shadow-lg font-medium flex items-center justify-center gap-2"
-                        >
-                            <Icon name="Search" size={18} />
-                            <span>Search Products & Services</span>
-                        </motion.button>
-                        
-                        {/* Mobile Search Modal */}
-                        <SearchForm 
-                            isVisible={isSearchVisible}
-                            onClose={() => setIsSearchVisible(false)}
-                            onSearch={handleSearch}
-                            searchInput={searchInput}
-                            setSearchInput={setSearchInput}
-                            searchCategory={searchCategory}
-                            setSearchCategory={setSearchCategory}
-                            searchLocation={searchLocation}
-                            setSearchLocation={setSearchLocation}
-                            categories={categories}
-                        />
-                        
-                        {/* Desktop Search Form */}
+                {/* Dynamic Banner Carousel Background */}
+                <BannerCarousel banners={banners} />
+
+                {/* Search Bar Overlay on Carousel */}
+                <div className="absolute top-0 left-0 right-0 z-30 bg-gradient-to-b from-black/40 via-black/20 to-transparent pt-6 pb-8 px-4">
+                    <div className="max-w-5xl mx-auto">
+                        {/* New Simple Search Section - Blinkit Style with Rotating Placeholder */}
                         <motion.div
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.4 }}
-                            className="hidden md:block bg-white/20 backdrop-blur-xl rounded-2xl p-4 shadow-2xl"
+                            transition={{ delay: 0.2, duration: 0.4 }}
+                            className="max-w-2xl mx-auto"
                         >
-                            <div className="grid grid-cols-4 gap-3">
-                                <input 
-                                    type="text" 
-                                    placeholder="What are you looking for?" 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
-                                    value={searchInput}
-                                    onChange={e => setSearchInput(e.target.value)}
-                                    aria-label="Search products or services"
-                                />
-                                <select 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
-                                    value={searchCategory}
-                                    onChange={e => setSearchCategory(e.target.value)}
-                                    aria-label="Select category"
-                                >
-                                    <option value="">All Categories</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.key} value={cat.key}>{cat.name}</option>
-                                    ))}
-                                </select>
-                                <input 
-                                    type="text" 
-                                    placeholder="Location" 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo"
-                                    value={searchLocation}
-                                    onChange={e => setSearchLocation(e.target.value)}
-                                    aria-label="Location"
-                                />
-                                <button 
-                                    className="bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 transition-transform shadow-button"
-                                    onClick={handleSearch}
-                                    aria-label="Search"
-                                >
+                            <div 
+                                onClick={toggleSearch}
+                                className="bg-white rounded-full shadow-2xl p-1 flex items-center gap-2 cursor-pointer hover:shadow-3xl transition-shadow overflow-hidden"
+                            >
+                                <Icon name="Search" size={24} className="text-brand-indigo ml-2 flex-shrink-0" />
+                                <div className="flex-1 relative h-10 flex items-center overflow-hidden">
+                                    <span className="text-gray-500 mr-2">Search for</span>
+                                    <AnimatePresence mode="wait">
+                                        <motion.span
+                                            key={currentPlaceholderIndex}
+                                            className="text-gray-500 font-medium"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            exit={{ y: -20, opacity: 0 }}
+                                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                                        >
+                                            {placeholderTexts[currentPlaceholderIndex]}
+                                        </motion.span>
+                                    </AnimatePresence>
+                                </div>
+                                <button className="bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink text-white px-6 py-2 rounded-full font-medium text-sm md:text-base flex-shrink-0">
                                     Search
                                 </button>
                             </div>
                         </motion.div>
                     </div>
                 </div>
+                
+                {/* Search Modal */}
+                <SearchModal 
+                    isVisible={isSearchVisible}
+                    onClose={() => setIsSearchVisible(false)}
+                    onSearch={handleSearch}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    searchCategory={searchCategory}
+                    setSearchCategory={setSearchCategory}
+                    searchLocation={searchLocation}
+                    setSearchLocation={setSearchLocation}
+                    categories={categories}
+                />
             </motion.section>
 
             <main className="w-full">

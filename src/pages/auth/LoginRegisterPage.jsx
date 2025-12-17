@@ -5,6 +5,8 @@ import { AppContext } from '../../context/AppContext';
 import api from '../../services/api';
 import Icon from '../../components/ui/Icon';
 import { FcGoogle, FaFacebook } from '../../components/ui/ReactIcons';
+import { signInWithGoogle } from '../../config/firebase';
+import { isProfileComplete, getProfileCompletionMessage } from '../../utils/profileValidation';
 
 const LoginRegisterPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,7 +17,7 @@ const LoginRegisterPage = () => {
   const [formAnimating, setFormAnimating] = useState(false);
   const auth = useContext(AuthContext);
   const { actions } = useContext(AppContext);
-  const { setAuth } = auth || {};
+  const { loginWithGoogle } = auth || {};
   const navigate = useNavigate();
 
   // Form states
@@ -35,6 +37,67 @@ const LoginRegisterPage = () => {
   // Form validation states
   const [validationErrors, setValidationErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState(0);
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      // Step 1: Sign in with Firebase
+      const result = await signInWithGoogle();
+      const firebaseUser = result.user;
+
+      console.log('Google Sign-In successful:', firebaseUser);
+
+      // Step 2: Send user data to backend
+      const googleUserData = {
+        name: firebaseUser.displayName,
+        email: firebaseUser.email,
+        providerId: firebaseUser.uid,
+        photoURL: firebaseUser.photoURL,
+      };
+
+      // Step 3: Authenticate with backend and store user in database
+      const response = await loginWithGoogle(googleUserData);
+
+      if (response.success) {
+        // Step 4: Check if profile is complete
+        const profileComplete = response.isProfileComplete || isProfileComplete(response.data);
+        
+        if (actions && actions.showToast) {
+          actions.showToast('success', 'Successfully signed in with Google!');
+        }
+
+        // Step 5: Redirect based on profile completion
+        if (!profileComplete) {
+          // Profile incomplete - redirect to profile page with message
+          if (actions && actions.showToast) {
+            const message = getProfileCompletionMessage(response.data);
+            actions.showToast('warning', message);
+          }
+          navigate('/profile', { 
+            state: { 
+              message: 'Please complete your profile by adding missing information',
+              missingFields: !response.data.phone ? ['phone'] : []
+            } 
+          });
+        } else {
+          // Profile complete - redirect to homepage
+          navigate('/');
+        }
+      } else {
+        throw new Error(response.error || 'Failed to authenticate with backend');
+      }
+
+    } catch (err) {
+      console.error("Google Sign-In error:", err);
+      setError(err.message || 'Failed to sign in with Google. Please try again.');
+      if (actions && actions.showToast) {
+        actions.showToast('error', 'Google sign-in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Animation effect for form switching
   useEffect(() => {
@@ -678,6 +741,8 @@ const LoginRegisterPage = () => {
             <div className="mt-6 grid grid-cols-2 gap-4">
               <button
                 type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
                 className="social-btn w-full inline-flex justify-center items-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm bg-white/70 hover:bg-white transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
               >
                 <FcGoogle size={22} className="mr-3" />

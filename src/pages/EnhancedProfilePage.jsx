@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { AppContext } from '../context/AppContext';
 import api from '../services/api';
+import { API_BASE_URL } from '../config/apiConfig';
 import Icon from '../components/ui/Icon';
 import { motion, AnimatePresence } from 'framer-motion';
+import { isProfileComplete, getProfileCompletionMessage } from '../utils/profileValidation';
 
 const EnhancedProfilePage = () => {
-  const { user, updateProfile, updatePassword, isLoading: authLoading } = useContext(AuthContext);
+  const location = useLocation();
+  const { user, setUser, updateProfile, updatePassword, isLoading: authLoading } = useContext(AuthContext);
+  const { actions } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -20,6 +26,10 @@ const EnhancedProfilePage = () => {
     dateOfBirth: '',
     gender: ''
   });
+
+  // State for file upload
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Password change form state
   const [passwordForm, setPasswordForm] = useState({
@@ -58,6 +68,27 @@ const EnhancedProfilePage = () => {
     }
   }, [user]);
 
+  // Check if redirected from login with incomplete profile
+  useEffect(() => {
+    if (location.state?.message && user) {
+      // Check if profile is incomplete
+      const profileComplete = isProfileComplete(user);
+      
+      if (!profileComplete) {
+        setMessage({ 
+          type: 'warning', 
+          text: location.state.message || getProfileCompletionMessage(user)
+        });
+        setEditMode(true); // Automatically enable edit mode
+        
+        // Show toast notification
+        if (actions && actions.showToast) {
+          actions.showToast('warning', location.state.message || 'Please complete your profile');
+        }
+      }
+    }
+  }, [location.state, user, actions]);
+
   // Fetch user statistics
   useEffect(() => {
     const fetchStats = async () => {
@@ -93,6 +124,49 @@ const EnhancedProfilePage = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setMessage({ type: 'error', text: 'Please upload only image files (JPEG, PNG, GIF, WEBP)' });
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Image size must be less than 5MB' });
+      return;
+    }
+
+    setSelectedFile(file);
+    setUploadingImage(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const formData = new FormData();
+      formData.append('profileImage', file);
+
+      const response = await api.auth.uploadProfileImage(formData);
+
+      if (response.success) {
+        setMessage({ type: 'success', text: 'Profile image uploaded successfully!' });
+        // Update user context with new image
+        if (response.data && response.data.user) {
+          setUser(response.data.user);
+        }
+      } else {
+        setMessage({ type: 'error', text: response.error || 'Failed to upload image' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || 'Failed to upload image' });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -218,14 +292,51 @@ const EnhancedProfilePage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        {/* Profile Incomplete Alert */}
+        {user && !isProfileComplete(user) && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg"
+          >
+            <div className="flex items-start">
+              <Icon name="alert-triangle" size={24} className="text-yellow-600 mr-3 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-yellow-800 mb-1">
+                  Profile Incomplete
+                </h3>
+                <p className="text-sm text-yellow-700">
+                  {getProfileCompletionMessage(user)}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-pink p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center text-brand-indigo shadow-lg">
-                <span className="text-2xl sm:text-3xl font-bold">
-                  {getInitials(user?.name)}
-                </span>
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center text-brand-indigo shadow-lg overflow-hidden">
+                {user?.profileImage || user?.photoURL ? (
+                  <img 
+                    src={user?.profileImage?.startsWith('http') ? user.profileImage : `${API_BASE_URL}${user.profileImage}`} 
+                    alt={user?.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to photoURL or initials if image fails to load
+                      if (user?.photoURL) {
+                        e.target.src = user.photoURL;
+                      } else {
+                        e.target.style.display = 'none';
+                      }
+                    }}
+                  />
+                ) : (
+                  <span className="text-2xl sm:text-3xl font-bold">
+                    {getInitials(user?.name)}
+                  </span>
+                )}
               </div>
               <div className="flex-1 text-white">
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2">{user?.name || 'User'}</h1>
@@ -474,6 +585,58 @@ const EnhancedProfilePage = () => {
                         placeholder="Enter your complete address"
                       />
                     </div>
+
+                    {editMode && (
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Profile Image
+                        </label>
+                        <div className="flex items-center gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-gray-200">
+                              {user?.profileImage || user?.photoURL ? (
+                                <img
+                                  src={user?.profileImage?.startsWith('http') ? user.profileImage : `${API_BASE_URL}${user.profileImage}`}
+                                  alt="Current profile"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    if (user?.photoURL) {
+                                      e.target.src = user.photoURL;
+                                    } else {
+                                      e.target.style.display = 'none';
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-2xl font-bold text-gray-400">
+                                  {getInitials(user?.name)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <label
+                              htmlFor="profile-image-upload"
+                              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                              <Icon name="upload" size={16} className="mr-2" />
+                              {uploadingImage ? 'Uploading...' : 'Choose Image'}
+                            </label>
+                            <input
+                              id="profile-image-upload"
+                              type="file"
+                              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                              onChange={handleFileChange}
+                              disabled={uploadingImage}
+                              className="hidden"
+                            />
+                            <p className="mt-2 text-sm text-gray-500">
+                              JPG, PNG, GIF or WEBP. Max size 5MB.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {editMode && (

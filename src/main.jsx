@@ -6,6 +6,7 @@ import './assets/global.css'
 import ErrorBoundary from './components/ErrorBoundary'
 import { AuthProvider } from './context/AuthContext'
 import { AppProvider } from './context/AppContext'
+import { LocationProvider } from './context/LocationContext'
 
 const root = document.getElementById('root')
 if (!root) {
@@ -16,7 +17,9 @@ if (!root) {
       <ErrorBoundary>
         <AuthProvider>
           <AppProvider>
-            <AppRouter />
+            <LocationProvider>
+              <AppRouter />
+            </LocationProvider>
           </AppProvider>
         </AuthProvider>
       </ErrorBoundary>

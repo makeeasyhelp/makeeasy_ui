@@ -23,6 +23,8 @@ import AdminCategoriesCRUDPage from './pages/admin/AdminCategoriesCRUDPage';
 import AdminServicesCRUDPage from './pages/admin/AdminServicesCRUDPage';
 import AdminAboutCRUDPage from './pages/admin/AdminAboutCRUDPage';
 import AdminManageUsersPage from './pages/admin/AdminManageUsersPage';
+import AdminBannersPage from './pages/admin/AdminBannersPage';
+import AdminLocationsPage from './pages/admin/AdminLocationsPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function AppRouter() {
@@ -123,6 +125,22 @@ function AppRouter() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminAboutCRUDPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/banners" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminBannersPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/locations" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLocationsPage />
               </ProtectedRoute>
             } 
           />

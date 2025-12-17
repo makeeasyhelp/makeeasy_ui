@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from '../ui/WhatsAppButton';
+import LocationModal from '../LocationModal';
 import { AuthContext } from '../../context/AuthContext';
 import { AppContext } from '../../context/AppContext';
 import { LogOut } from 'lucide-react';
@@ -84,6 +85,8 @@ const Layout = () => {
           <button onClick={() => navigate('/admin/categories')} className="text-brand-indigo whitespace-nowrap">Categories</button>
           <button onClick={() => navigate('/admin/services')} className="text-brand-indigo whitespace-nowrap">Services</button>
           <button onClick={() => navigate('/admin/about')} className="text-brand-indigo whitespace-nowrap">About</button>
+          <button onClick={() => navigate('/admin/banners')} className="text-brand-indigo whitespace-nowrap">Banners</button>
+          <button onClick={() => navigate('/admin/locations')} className="text-brand-indigo whitespace-nowrap">Locations</button>
           <button
             onClick={handleAdminLogout}
             className="flex items-center gap-1 text-red-500 font-semibold ml-auto"
@@ -115,6 +118,9 @@ const Layout = () => {
       <div className="fixed bottom-20 right-4 sm:bottom-24">
         <WhatsAppButton />
       </div>
+
+      {/* Location Modal */}
+      <LocationModal />
     </div>
   );
 };

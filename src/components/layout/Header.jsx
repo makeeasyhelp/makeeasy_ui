@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
-import { Menu, X, User, ShoppingCart } from 'lucide-react';
+import { Menu, X, User, ShoppingCart, MapPin } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../../context/AuthContext';
+import { useLocationContext } from '../../context/LocationContext';
 import newLogo from '../../assets/newwlogo.png';
 
 const getInitials = (name = '') => {
@@ -21,6 +22,7 @@ const Header = ({ activePage }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const lastScrollY = useRef(0);
   const { user, logout } = useContext(AuthContext);
+  const { selectedLocation, openLocationModal } = useLocationContext();
   const isLoggedIn = !!user;
 
   const navLinks = useMemo(() => [
@@ -68,15 +70,41 @@ const Header = ({ activePage }) => {
     >
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
-            <img
-              src={newLogo}
-              alt="MakeEasy Logo"
-              className="h-10 w-auto"
-              onError={handleLogoError}
-            />
-          </Link>
+          {/* Logo & Location */}
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex-shrink-0">
+              <img
+                src={newLogo}
+                alt="MakeEasy Logo"
+                className="h-10 w-auto"
+                onError={handleLogoError}
+              />
+            </Link>
+
+            {/* Location Display */}
+            <button
+              onClick={openLocationModal}
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
+            >
+              <MapPin size={16} className="text-brand-indigo" />
+              <div className="text-left">
+                {selectedLocation ? (
+                  <>
+                    <div className="text-xs font-semibold text-gray-900">
+                      {selectedLocation.district}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {selectedLocation.state}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-sm font-medium text-gray-600 group-hover:text-brand-indigo">
+                    Select Location
+                  </div>
+                )}
+              </div>
+            </button>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-1">
@@ -176,6 +204,33 @@ const Header = ({ activePage }) => {
             className="md:hidden bg-white/95 backdrop-blur-md border-t overflow-hidden"
           >
             <div className="px-4 py-4 space-y-2">
+              {/* Mobile Location Selector */}
+              <button
+                onClick={() => {
+                  openLocationModal();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors mb-3"
+              >
+                <MapPin size={20} className="text-brand-indigo" />
+                <div className="text-left flex-1">
+                  {selectedLocation ? (
+                    <>
+                      <div className="text-sm font-semibold text-gray-900">
+                        {selectedLocation.district}, {selectedLocation.state}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Click to change location
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm font-medium text-gray-600">
+                      Select Your Location
+                    </div>
+                  )}
+                </div>
+              </button>
+
               {navLinks.map(link => (
                 <Link
                   key={link.name}
