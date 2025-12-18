@@ -96,6 +96,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google OAuth login
+  const loginWithGoogle = async (googleUserData) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await api.auth.googleAuth(googleUserData);
+      if (response.success && response.token && response.data) {
+        // Store token and setup auth
+        api.setAuthToken(response.token);
+        // Set user data
+        setUser(response.data);
+        return {
+          success: true,
+          token: response.token,
+          data: response.data,
+          isProfileComplete: response.isProfileComplete
+        };
+      } else {
+        const errorMsg = response.error || 'Google authentication failed';
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    } catch (err) {
+      const errorMessage = err.message || 'Google authentication failed. Please try again.';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Logout user
   const logout = async () => {
     setIsLoading(true);
@@ -168,6 +199,7 @@ export const AuthProvider = ({ children }) => {
         error,
         login,
         register,
+        loginWithGoogle,
         logout,
         updateProfile,
         updatePassword,

@@ -12,7 +12,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useContext(AuthContext);
   const { cart, cartTotal, clearCart } = useApp();
-  
+
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -76,7 +76,7 @@ const CheckoutPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (paymentMethod === 'card') {
       setCardDetails({
         ...cardDetails,
@@ -88,7 +88,7 @@ const CheckoutPage = () => {
         [name]: value
       });
     }
-    
+
     // Clear validation error when field is edited
     if (formErrors[name]) {
       setFormErrors({
@@ -100,7 +100,7 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (paymentMethod === 'card') {
       if (!cardDetails.cardNumber.trim()) {
         errors.cardNumber = 'Card number is required';
@@ -134,28 +134,34 @@ const CheckoutPage = () => {
     return errors;
   };
 
-  const createBookingFromCart = async () => {
+  const createOrderFromCart = async () => {
     try {
-      // Prepare booking data from cart
-      const bookingData = {
-        products: cart.map(item => ({
-          productId: item.id,
+      // Prepare order data from cart
+      const orderData = {
+        items: cart.map(item => ({
+          productId: item.productId || (item.type === 'product' ? item.id : undefined),
+          serviceId: item.serviceId || (item.type === 'service' ? item.id : undefined),
           quantity: item.quantity,
-          days: 1, // Default rental period
           price: item.price,
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Default 1 day
         })),
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Default 1 day
         totalAmount: orderTotal,
-        paymentStatus: 'pending'
+        paymentMethod: paymentMethod,
+        shippingAddress: {
+          address: "123 Main St", // Placeholder or get from form if added
+          city: "City",
+          postalCode: "12345",
+          country: "India"
+        }
       };
-      
-      const response = await api.bookings.createBooking(bookingData);
-      
+
+      const response = await api.orders.createOrder(orderData);
+
       if (response.success) {
         return response.data;
       } else {
-        throw new Error(response.error || 'Failed to create booking');
+        throw new Error(response.error || 'Failed to create order');
       }
     } catch (err) {
       throw err;
@@ -164,35 +170,35 @@ const CheckoutPage = () => {
 
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-    
+
     setProcessingPayment(true);
-    
+
     try {
       let currentBooking = booking;
-      
+
       // If no booking exists yet (coming from cart), create one
       if (!bookingId) {
-        currentBooking = await createBookingFromCart();
+        currentBooking = await createOrderFromCart();
       }
-      
+
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update payment status on the booking
-      await api.bookings.updatePaymentStatus(currentBooking.id, 'completed');
-      
+
+      // Update payment status on the order
+      await api.orders.updateOrder(currentBooking._id || currentBooking.id, { paymentStatus: 'completed' });
+
       // Clear cart after successful payment (if coming from cart)
       if (!bookingId) {
         clearCart();
       }
-      
+
       setPaymentSuccess(true);
     } catch (err) {
       setError(err.message || 'Payment processing failed. Please try again.');
@@ -259,10 +265,10 @@ const CheckoutPage = () => {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Alert 
-          type={Alert.Type.ERROR} 
-          message="Failed to load checkout information" 
-          details={error} 
+        <Alert
+          type={Alert.Type.ERROR}
+          message="Failed to load checkout information"
+          details={error}
           className="mb-6"
           onClose={() => setError('')}
         />
@@ -281,8 +287,8 @@ const CheckoutPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-6 flex items-center">
-        <button 
-          onClick={() => navigate(-1)} 
+        <button
+          onClick={() => navigate(-1)}
           className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors mr-4"
         >
           <ArrowLeft size={20} className="text-gray-700" />
@@ -296,12 +302,12 @@ const CheckoutPage = () => {
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 sticky top-24">
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
-              
+
               {bookingId && booking ? (
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center gap-3">
                     <div className="h-16 w-16 rounded-md bg-gray-100 overflow-hidden">
-                      <img 
+                      <img
                         src={booking.product?.image || `https://placehold.co/300x300/f3f4f6/4f46e5?text=${encodeURIComponent(booking.product?.name?.charAt(0) || 'P')}`}
                         alt={booking.product?.name || 'Product'}
                         className="h-full w-full object-cover"
@@ -314,7 +320,7 @@ const CheckoutPage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="border-t border-gray-100 pt-4">
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-600">Subtotal</span>
@@ -335,7 +341,7 @@ const CheckoutPage = () => {
                   {cart.map(item => (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="h-16 w-16 rounded-md bg-gray-100 overflow-hidden">
-                        <img 
+                        <img
                           src={item.image || `https://placehold.co/300x300/f3f4f6/4f46e5?text=${encodeURIComponent(item.name.charAt(0))}`}
                           alt={item.name}
                           className="h-full w-full object-cover"
@@ -349,7 +355,7 @@ const CheckoutPage = () => {
                       </div>
                     </div>
                   ))}
-                  
+
                   <div className="border-t border-gray-100 pt-4">
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-600">Subtotal</span>
@@ -379,37 +385,34 @@ const CheckoutPage = () => {
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
             <div className="p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
-              
+
               <div className="mb-6">
                 <div className="grid grid-cols-3 gap-4">
-                  <button 
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
-                      paymentMethod === 'card' 
-                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo' 
+                  <button
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${paymentMethod === 'card'
+                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod('card')}
                   >
                     <CreditCard size={24} className="mb-2" />
                     <span className="text-sm font-medium">Credit Card</span>
                   </button>
-                  <button 
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
-                      paymentMethod === 'upi' 
-                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo' 
+                  <button
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${paymentMethod === 'upi'
+                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod('upi')}
                   >
                     <Wallet size={24} className="mb-2" />
                     <span className="text-sm font-medium">UPI</span>
                   </button>
-                  <button 
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${
-                      paymentMethod === 'netbanking' 
-                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo' 
+                  <button
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all ${paymentMethod === 'netbanking'
+                        ? 'border-brand-indigo bg-indigo-50 text-brand-indigo'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod('netbanking')}
                   >
                     <BuildingBank size={24} className="mb-2" />
@@ -417,7 +420,7 @@ const CheckoutPage = () => {
                   </button>
                 </div>
               </div>
-              
+
               {paymentMethod === 'card' && (
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
                   <div>
@@ -437,7 +440,7 @@ const CheckoutPage = () => {
                       <p className="mt-1 text-sm text-red-600">{formErrors.cardNumber}</p>
                     )}
                   </div>
-                  
+
                   <div>
                     <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">
                       Name on Card
@@ -455,7 +458,7 @@ const CheckoutPage = () => {
                       <p className="mt-1 text-sm text-red-600">{formErrors.cardName}</p>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 mb-1">
@@ -492,7 +495,7 @@ const CheckoutPage = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={processingPayment}
@@ -509,7 +512,7 @@ const CheckoutPage = () => {
                   </button>
                 </form>
               )}
-              
+
               {paymentMethod === 'upi' && (
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
                   <div>
@@ -529,7 +532,7 @@ const CheckoutPage = () => {
                       <p className="mt-1 text-sm text-red-600">{formErrors.upiId}</p>
                     )}
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={processingPayment}
@@ -546,12 +549,12 @@ const CheckoutPage = () => {
                   </button>
                 </form>
               )}
-              
+
               {paymentMethod === 'netbanking' && (
                 <div>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mb-6">
                     {['SBI', 'HDFC', 'ICICI', 'Axis', 'Yes Bank', 'Kotak', 'PNB', 'BOB'].map(bank => (
-                      <button 
+                      <button
                         key={bank}
                         className="flex flex-col items-center justify-center p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all"
                       >
@@ -562,7 +565,7 @@ const CheckoutPage = () => {
                       </button>
                     ))}
                   </div>
-                  
+
                   <button
                     onClick={handlePaymentSubmit}
                     disabled={processingPayment}
@@ -579,7 +582,7 @@ const CheckoutPage = () => {
                   </button>
                 </div>
               )}
-              
+
               <div className="mt-8 text-center text-sm text-gray-500">
                 <p>Your payment information is secure with us.</p>
                 <p>We use encryption to protect your data.</p>
