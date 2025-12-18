@@ -27,12 +27,23 @@ const iconMap = {
   'map-pin': 'MapPin',
   'phone': 'Phone',
   'mail': 'Mail',
+  'lock-keyhole': 'LockKeyhole',
+  "eye": 'Eye',
+  "eye-off": 'EyeOff',
+  "facebook": 'Facebook',
+  "chromium": 'Chromium',
+  "key-round": 'KeyRound',
+  "user-plus": 'UserPlus',
+  "lock": 'Lock',
+  "arrow-left": 'ArrowLeft',
+
   
   // Status and feedback
   'check': 'Check',
   'alert': 'AlertTriangle',
   'info': 'Info',
   'loading': 'Loader2',
+  "loader": 'Loader',
 };
 
 /**
