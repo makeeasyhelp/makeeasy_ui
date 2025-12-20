@@ -290,20 +290,29 @@ export const categoriesAPI = {
   },
 
   createCategory: async (categoryData) => {
+    // For FormData (with file uploads), don't set Content-Type header
+    // Browser will set it automatically with correct boundary
+    const headers = getHeaders();
+    delete headers['Content-Type']; // Remove JSON content-type for FormData
+
     const response = await fetch(`${API_URL}/categories`, {
       method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(categoryData),
+      headers: headers,
+      body: categoryData, // FormData - don't stringify
     });
 
     return await handleResponse(response);
   },
 
   updateCategory: async (id, categoryData) => {
+    // For FormData (with file uploads), don't set Content-Type header
+    const headers = getHeaders();
+    delete headers['Content-Type']; // Remove JSON content-type for FormData
+
     const response = await fetch(`${API_URL}/categories/${id}`, {
       method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(categoryData),
+      headers: headers,
+      body: categoryData, // FormData - don't stringify
     });
 
     return await handleResponse(response);
@@ -356,20 +365,28 @@ export const servicesAPI = {
   },
 
   createService: async (serviceData) => {
+    // For FormData (with file uploads), don't set Content-Type header
+    const headers = getHeaders();
+    delete headers['Content-Type']; // Remove JSON content-type for FormData
+
     const response = await fetch(`${API_URL}/services`, {
       method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(serviceData),
+      headers: headers,
+      body: serviceData, // FormData - don't stringify
     });
 
     return await handleResponse(response);
   },
 
   updateService: async (id, serviceData) => {
+    // For FormData (with file uploads), don't set Content-Type header
+    const headers = getHeaders();
+    delete headers['Content-Type']; // Remove JSON content-type for FormData
+
     const response = await fetch(`${API_URL}/services/${id}`, {
       method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(serviceData),
+      headers: headers,
+      body: serviceData, // FormData - don't stringify
     });
 
     return await handleResponse(response);

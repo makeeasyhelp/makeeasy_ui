@@ -64,29 +64,30 @@ const Header = ({ activePage }) => {
       transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
       className={`sticky top-0 z-50 w-full transition-shadow duration-200 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-md'
+          ? 'bg-white/75 backdrop-blur-md shadow-md'
           : 'bg-white/80 backdrop-blur'
       }`}
     >
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Location */}
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="flex-shrink-0">
             <Link to="/" className="flex-shrink-0">
               <img
                 src={newLogo}
                 alt="MakeEasy Logo"
-                className="h-10 w-auto"
+                className="h-22 w-48"
                 onError={handleLogoError}
               />
             </Link>
+          </div>
 
             {/* Location Display */}
             <button
               onClick={openLocationModal}
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-transparent hover:bg-gray-200 transition-colors group whitespace-nowrap"
             >
-              <MapPin size={16} className="text-brand-indigo" />
+              <MapPin size={16} className="text-brand-indigo flex-shrink-0" />
               <div className="text-left">
                 {selectedLocation ? (
                   <>
@@ -104,30 +105,32 @@ const Header = ({ activePage }) => {
                 )}
               </div>
             </button>
-          </div>
+          {/* Center Section: Location & Nav Links */}
+          <div className="hidden md:flex items-center gap-8 flex-1 justify-center">
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-1">
-            {navLinks.map(link => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`relative px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                  activePage === link.name
-                    ? 'text-brand-indigo'
-                    : 'text-gray-700 hover:text-brand-indigo'
-                } group`}
-              >
-                {link.name}
-                {activePage === link.name && (
-                  <motion.span 
-                    layoutId="active-nav-underline"
-                    className="absolute left-0 right-0 -bottom-1 h-0.5 bg-brand-indigo"
-                  />
-                )}
-              </Link>
-            ))}
-          </nav>
+            {/* Desktop Nav */}
+            <nav className="flex items-center space-x-1">
+              {navLinks.map(link => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`relative px-3 py-2 text-sm font-bold rounded-md transition-colors duration-200 ${
+                    activePage === link.name
+                      ? 'text-brand-indigo'
+                      : 'text-gray-700 hover:text-brand-indigo'
+                  } group`}
+                >
+                  {link.name}
+                  {activePage === link.name && (
+                    <motion.span 
+                      layoutId="active-nav-underline"
+                      className="absolute left-0 right-0 -bottom-1 h-0.5 bg-brand-indigo"
+                    />
+                  )}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
           {/* Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3 relative">

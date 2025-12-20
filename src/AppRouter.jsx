@@ -21,6 +21,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsCRUDPage from './pages/admin/AdminProductsCRUDPage';
 import AdminCategoriesCRUDPage from './pages/admin/AdminCategoriesCRUDPage';
 import AdminServicesCRUDPage from './pages/admin/AdminServicesCRUDPage';
+import AdminProfessionalServicesCRUDPage from './pages/admin/AdminProfessionalServicesCRUDPage';
 import AdminAboutCRUDPage from './pages/admin/AdminAboutCRUDPage';
 import AdminManageUsersPage from './pages/admin/AdminManageUsersPage';
 import AdminBannersPage from './pages/admin/AdminBannersPage';
@@ -117,6 +118,14 @@ function AppRouter() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminServicesCRUDPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/professional-services" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminProfessionalServicesCRUDPage />
               </ProtectedRoute>
             } 
           />

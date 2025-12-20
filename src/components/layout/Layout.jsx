@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import Header from './Header';
+import Breadcrumb from './Breadcrumb';
 import Footer from './Footer';
 import WhatsAppButton from '../ui/WhatsAppButton';
 import LocationModal from '../LocationModal';
@@ -79,23 +80,82 @@ const Layout = () => {
 
       {/* Admin Bar */}
       {isAdmin && (
-        <div className="bg-brand-indigo/10 py-2 px-2 sm:px-4 flex gap-3 items-center justify-start overflow-x-auto text-sm scrollbar-hide">
-          <button onClick={() => navigate('/admin/dashboard')} className="text-brand-indigo font-semibold whitespace-nowrap">Dashboard</button>
-          <button onClick={() => navigate('/admin/products')} className="text-brand-indigo whitespace-nowrap">Products</button>
-          <button onClick={() => navigate('/admin/categories')} className="text-brand-indigo whitespace-nowrap">Categories</button>
-          <button onClick={() => navigate('/admin/services')} className="text-brand-indigo whitespace-nowrap">Services</button>
-          <button onClick={() => navigate('/admin/about')} className="text-brand-indigo whitespace-nowrap">About</button>
-          <button onClick={() => navigate('/admin/banners')} className="text-brand-indigo whitespace-nowrap">Banners</button>
-          <button onClick={() => navigate('/admin/locations')} className="text-brand-indigo whitespace-nowrap">Locations</button>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-gradient-to-r from-brand-indigo/10 via-brand-purple/10 to-brand-pink/10 border-b-2 border-brand-indigo/20 py-3 px-2 sm:px-6 flex gap-2 md:gap-4 items-center justify-start overflow-x-auto text-sm scrollbar-hide"
+        >
+          <span className="text-brand-indigo font-bold whitespace-nowrap mr-2 md:mr-6 hidden sm:inline">Admin Panel:</span>
+          
+          <button 
+            onClick={() => navigate('/admin/dashboard')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Dashboard
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/products')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Products
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/categories')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Categories
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/services')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Services
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/about')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            About
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/banners')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Banners
+          </button>
+          
+          <button 
+            onClick={() => navigate('/admin/locations')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Locations
+          </button>
+
+          <button 
+            onClick={() => navigate('/admin/users')}
+            className="px-3 md:px-4 py-2 rounded-lg font-semibold text-brand-indigo hover:bg-white hover:shadow-md transition-all whitespace-nowrap"
+          >
+            Users
+          </button>
+          
           <button
             onClick={handleAdminLogout}
-            className="flex items-center gap-1 text-red-500 font-semibold ml-auto"
+            className="flex items-center gap-1 text-red-600 font-semibold ml-auto px-3 md:px-4 py-2 rounded-lg hover:bg-red-50 hover:shadow-md transition-all whitespace-nowrap"
           >
             <LogOut size={16} />
             <span className="hidden sm:inline">Logout</span>
           </button>
-        </div>
+        </motion.div>
       )}
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb />
 
       {/* Page Content */}
       <main className="flex-grow w-full">
