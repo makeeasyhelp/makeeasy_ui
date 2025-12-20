@@ -64,29 +64,30 @@ const Header = ({ activePage }) => {
       transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
       className={`sticky top-0 z-50 w-full transition-shadow duration-200 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-md'
+          ? 'bg-white/75 backdrop-blur-md shadow-md'
           : 'bg-white/80 backdrop-blur'
       }`}
     >
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Location */}
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="flex-shrink-0">
             <Link to="/" className="flex-shrink-0">
               <img
                 src={newLogo}
                 alt="MakeEasy Logo"
-                className="h-10 w-auto"
+                className="h-22 w-48"
                 onError={handleLogoError}
               />
             </Link>
+          </div>
 
             {/* Location Display */}
             <button
               onClick={openLocationModal}
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-transparent hover:bg-gray-200 transition-colors group whitespace-nowrap"
             >
-              <MapPin size={16} className="text-brand-indigo" />
+              <MapPin size={16} className="text-brand-indigo flex-shrink-0" />
               <div className="text-left">
                 {selectedLocation ? (
                   <>
@@ -104,33 +105,52 @@ const Header = ({ activePage }) => {
                 )}
               </div>
             </button>
-          </div>
+          {/* Center Section: Location & Nav Links */}
+          <div className="hidden md:flex items-center gap-8 flex-1 justify-center">
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-1">
-            {navLinks.map(link => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`relative px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                  activePage === link.name
-                    ? 'text-brand-indigo'
-                    : 'text-gray-700 hover:text-brand-indigo'
-                } group`}
-              >
-                {link.name}
-                {activePage === link.name && (
-                  <motion.span 
-                    layoutId="active-nav-underline"
-                    className="absolute left-0 right-0 -bottom-1 h-0.5 bg-brand-indigo"
-                  />
-                )}
-              </Link>
-            ))}
-          </nav>
+            {/* Desktop Nav */}
+            <nav className="flex items-center space-x-1">
+              {navLinks.map(link => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`relative px-3 py-2 text-sm font-bold rounded-md transition-colors duration-200 ${
+                    activePage === link.name
+                      ? 'text-brand-indigo'
+                      : 'text-gray-700 hover:text-brand-indigo'
+                  } group`}
+                >
+                  {link.name}
+                  {activePage === link.name && (
+                    <motion.span 
+                      layoutId="active-nav-underline"
+                      className="absolute left-0 right-0 -bottom-1 h-0.5 bg-brand-indigo"
+                    />
+                  )}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
           {/* Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3 relative">
+            {/* Rental Cart Icon */}
+            <Link 
+              to="/rental-cart"
+              className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ShoppingCart size={22} className="text-gray-700" />
+              {(() => {
+                const cart = JSON.parse(localStorage.getItem('rentalCart') || '[]');
+                const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+                return itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                );
+              })()}
+            </Link>
+
             {isLoggedIn ? (
               <div
                 className="relative"
@@ -156,6 +176,7 @@ const Header = ({ activePage }) => {
                     >
                       <Link to="/profile" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Profile</Link>
                       <Link to="/orders" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Orders</Link>
+                      <Link to="/user/rentals" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">My Rentals</Link>
                       <Link to="/user-services" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Your Services</Link>
                       <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>
                     </motion.div>
@@ -171,16 +192,6 @@ const Header = ({ activePage }) => {
                 <User size={18} />
               </button>
             )}
-
-            <button
-              onClick={() => navigate('/cart')}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors relative"
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCart size={18} />
-              {/* Optional: Add a badge for cart items */}
-              {/* <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">3</span> */}
-            </button>
 
             {/* Mobile Toggle */}
             <button
@@ -253,6 +264,7 @@ const Header = ({ activePage }) => {
                     <span className="font-medium">{user?.name}</span>
                   </Link>
                   <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">Orders</Link>
+                  <Link to="/user/rentals" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">My Rentals</Link>
                   <Link to="/user-services" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">Your Services</Link>
                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full mt-2 py-2 text-center rounded-md text-base font-medium bg-red-500 text-white">Logout</button>
                 </>

@@ -32,7 +32,7 @@ const Footer = () => {
                     {/* About Section */}
                     <div>
                         <div className="flex items-center mb-6">
-                            <img
+                            {/* <img
                                 src={newLogo}
                                 alt="MakeEasy Logo"
                                 className="h-10 w-auto mr-3"
@@ -40,7 +40,7 @@ const Footer = () => {
                                     e.target.onerror = null;
                                     e.target.src = "https://placehold.co/200x80/4f46e5/ffffff?text=MakeEasy";
                                 }}
-                            />
+                            /> */}
                             <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-brand-indigo to-brand-pink bg-clip-text text-transparent">MakeEasy</h3>
                         </div>
                         <p className="text-gray-400 mb-6 text-sm md:text-base">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, Filter, Star, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { productsAPI } from "../services/api";
 
 // Skeleton loader (grid style)
@@ -13,6 +14,7 @@ const ProductCardSkeleton = () => (
 );
 
 const ProductsPage = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -183,10 +185,19 @@ const ProductsPage = ({ onNavigate }) => {
           {filteredProducts.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-transform"
+              onClick={() => navigate(`/rental/product/${product._id}`)}
+              className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all cursor-pointer"
             >
               <div className="h-40 bg-gray-100 flex items-center justify-center">
-                <span className="text-gray-400 text-sm">No Image</span>
+                {product.images && product.images[0] ? (
+                  <img 
+                    src={product.images[0]} 
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-sm">No Image</span>
+                )}
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-lg mb-1 truncate">
@@ -195,15 +206,53 @@ const ProductsPage = ({ onNavigate }) => {
                 <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                   {product.description}
                 </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-brand-indigo">
-                    ₹{product.price}
-                  </span>
+                
+                {/* Price Section */}
+                <div className="mb-3">
+                  {product.cityPricing && product.cityPricing.length > 0 ? (
+                    <div>
+                      <span className="text-sm text-gray-500">Starting from</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-bold text-brand-indigo">
+                          ₹{Math.min(...product.cityPricing.flatMap(cp => 
+                            cp.tenures?.map(t => t.monthlyRent) || []
+                          ))}
+                        </span>
+                        <span className="text-gray-500 text-sm">/month</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-xl font-bold text-brand-indigo">
+                      ₹{product.price}
+                    </span>
+                  )}
+                </div>
+
+                {/* Location & Rating */}
+                <div className="flex items-center justify-between mb-3">
                   <span className="flex items-center text-gray-500 text-sm">
                     <MapPin size={14} className="mr-1" />
-                    {product.location}
+                    {product.location || 'Multiple Cities'}
                   </span>
+                  {product.averageRating && (
+                    <span className="flex items-center text-yellow-500 text-sm">
+                      <Star size={14} className="mr-1 fill-current" />
+                      {product.averageRating.toFixed(1)}
+                    </span>
+                  )}
                 </div>
+
+                {/* Action Button */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/rental/product/${product._id}`);
+                  }}
+                  className="w-full bg-brand-indigo text-white py-2 rounded-lg font-semibold hover:bg-brand-indigo-dark transition-colors"
+                >
+                  Book Now
+                </button>
+
                 {product.featured && (
                   <span className="inline-flex items-center gap-1 mt-3 text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                     <Star size={12} /> Featured

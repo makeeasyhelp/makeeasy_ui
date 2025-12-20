@@ -127,6 +127,9 @@ const EnhancedProfilePage = () => {
   };
 
   const handleFileChange = async (e) => {
+    e.preventDefault(); // Prevent any default form behavior
+    e.stopPropagation(); // Stop event from bubbling up
+    
     const file = e.target.files[0];
     if (!file) return;
 
@@ -143,6 +146,15 @@ const EnhancedProfilePage = () => {
       return;
     }
 
+    // Create immediate preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // Temporarily update UI with preview
+      const tempUser = { ...user, profileImage: reader.result };
+      setUser(tempUser);
+    };
+    reader.readAsDataURL(file);
+
     setSelectedFile(file);
     setUploadingImage(true);
     setMessage({ type: '', text: '' });
@@ -155,17 +167,24 @@ const EnhancedProfilePage = () => {
 
       if (response.success) {
         setMessage({ type: 'success', text: 'Profile image uploaded successfully!' });
-        // Update user context with new image
+        // Update user context with new image from server
         if (response.data && response.data.user) {
           setUser(response.data.user);
         }
+        // Clear the file input
+        e.target.value = '';
       } else {
         setMessage({ type: 'error', text: response.error || 'Failed to upload image' });
+        // Revert to original image on error
+        setUser(user);
       }
     } catch (error) {
       setMessage({ type: 'error', text: error.message || 'Failed to upload image' });
+      // Revert to original image on error
+      setUser(user);
     } finally {
       setUploadingImage(false);
+      setSelectedFile(null);
     }
   };
 
@@ -479,6 +498,61 @@ const EnhancedProfilePage = () => {
                   )}
                 </div>
 
+                {/* Profile Image Upload Section - OUTSIDE form to prevent conflicts */}
+                {editMode && (
+                  <div className="mb-6 p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Profile Image
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-gray-200">
+                          {user?.profileImage || user?.photoURL ? (
+                            <img
+                              src={user?.profileImage?.startsWith('http') ? user.profileImage : `${API_BASE_URL}${user.profileImage}`}
+                              alt="Current profile"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                if (user?.photoURL) {
+                                  e.target.src = user.photoURL;
+                                } else {
+                                  e.target.style.display = 'none';
+                                }
+                              }}
+                            />
+                          ) : (
+                            <span className="text-2xl font-bold text-gray-400">
+                              {getInitials(user?.name)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label
+                          htmlFor="profile-image-upload"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                        >
+                          <Icon name="upload" size={16} className="mr-2" />
+                          {uploadingImage ? 'Uploading...' : 'Choose Image'}
+                        </label>
+                        <input
+                          id="profile-image-upload"
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                          onChange={handleFileChange}
+                          onClick={(e) => e.stopPropagation()}
+                          disabled={uploadingImage}
+                          className="hidden"
+                        />
+                        <p className="mt-2 text-sm text-gray-500">
+                          JPG, PNG, GIF or WEBP. Max size 5MB.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleProfileSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -585,58 +659,6 @@ const EnhancedProfilePage = () => {
                         placeholder="Enter your complete address"
                       />
                     </div>
-
-                    {editMode && (
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Profile Image
-                        </label>
-                        <div className="flex items-center gap-4">
-                          <div className="flex-shrink-0">
-                            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-gray-200">
-                              {user?.profileImage || user?.photoURL ? (
-                                <img
-                                  src={user?.profileImage?.startsWith('http') ? user.profileImage : `${API_BASE_URL}${user.profileImage}`}
-                                  alt="Current profile"
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    if (user?.photoURL) {
-                                      e.target.src = user.photoURL;
-                                    } else {
-                                      e.target.style.display = 'none';
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <span className="text-2xl font-bold text-gray-400">
-                                  {getInitials(user?.name)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <label
-                              htmlFor="profile-image-upload"
-                              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
-                            >
-                              <Icon name="upload" size={16} className="mr-2" />
-                              {uploadingImage ? 'Uploading...' : 'Choose Image'}
-                            </label>
-                            <input
-                              id="profile-image-upload"
-                              type="file"
-                              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                              onChange={handleFileChange}
-                              disabled={uploadingImage}
-                              className="hidden"
-                            />
-                            <p className="mt-2 text-sm text-gray-500">
-                              JPG, PNG, GIF or WEBP. Max size 5MB.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {editMode && (

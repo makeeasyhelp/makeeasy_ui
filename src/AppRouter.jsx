@@ -21,11 +21,26 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsCRUDPage from './pages/admin/AdminProductsCRUDPage';
 import AdminCategoriesCRUDPage from './pages/admin/AdminCategoriesCRUDPage';
 import AdminServicesCRUDPage from './pages/admin/AdminServicesCRUDPage';
+import AdminProfessionalServicesCRUDPage from './pages/admin/AdminProfessionalServicesCRUDPage';
 import AdminAboutCRUDPage from './pages/admin/AdminAboutCRUDPage';
 import AdminManageUsersPage from './pages/admin/AdminManageUsersPage';
 import AdminBannersPage from './pages/admin/AdminBannersPage';
 import AdminLocationsPage from './pages/admin/AdminLocationsPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+
+// Rental System Components
+import RentalProductDetailsPage from './pages/RentalProductDetailsPage';
+import KYCUploadPage from './pages/KYCUploadPage';
+import UserRentalDashboard from './pages/UserRentalDashboard';
+import ServiceRequestForm from './pages/ServiceRequestForm';
+import AdminRentalManagement from './pages/admin/AdminRentalManagement';
+import AdminKYCReview from './pages/admin/AdminKYCReview';
+import AdminServiceRequestManagement from './pages/admin/AdminServiceRequestManagement';
+import EnhancedRentalProductDetailsPage from './pages/EnhancedRentalProductDetailsPage';
+import RentalCartPage from './pages/RentalCartPage';
+import RentalCheckoutPage from './pages/RentalCheckoutPage';
+import PaymentPage from './pages/PaymentPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 
 function AppRouter() {
   return (
@@ -41,8 +56,9 @@ function AppRouter() {
           <Route path="contact" element={<ContactPage />} />
           <Route path="login" element={<LoginRegisterPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="checkout/:bookingId" element={<ImprovedCheckoutPage />} />
-          <Route path="checkout" element={<ImprovedCheckoutPage />} />
+          {/* Old checkout routes - replaced by RentalCheckoutPage */}
+          {/* <Route path="checkout/:bookingId" element={<ImprovedCheckoutPage />} /> */}
+          {/* <Route path="checkout" element={<ImprovedCheckoutPage />} /> */}
           
           {/* Protected Routes */}
           <Route 
@@ -74,6 +90,66 @@ function AppRouter() {
             element={
               <ProtectedRoute>
                 <CartPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Rental System Routes */}
+          <Route path="rental/product/:id" element={<EnhancedRentalProductDetailsPage />} />
+          <Route path="rental-cart" element={<RentalCartPage />} />
+          <Route 
+            path="checkout" 
+            element={
+              <ProtectedRoute>
+                <RentalCheckoutPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="payment" 
+            element={
+              <ProtectedRoute>
+                <PaymentPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="order-success" 
+            element={
+              <ProtectedRoute>
+                <OrderSuccessPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="kyc-upload" 
+            element={
+              <ProtectedRoute>
+                <KYCUploadPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user/kyc-upload" 
+            element={
+              <ProtectedRoute>
+                <KYCUploadPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user/rentals" 
+            element={
+              <ProtectedRoute>
+                <UserRentalDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="service-request/create" 
+            element={
+              <ProtectedRoute>
+                <ServiceRequestForm />
               </ProtectedRoute>
             } 
           />
@@ -121,6 +197,14 @@ function AppRouter() {
             } 
           />
           <Route 
+            path="admin/professional-services" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminProfessionalServicesCRUDPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="admin/about" 
             element={
               <ProtectedRoute requiredRole="admin">
@@ -141,6 +225,32 @@ function AppRouter() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminLocationsPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Admin Rental Management Routes */}
+          <Route 
+            path="admin/rentals" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminRentalManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/kyc" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminKYCReview />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="admin/service-requests" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminServiceRequestManagement />
               </ProtectedRoute>
             } 
           />

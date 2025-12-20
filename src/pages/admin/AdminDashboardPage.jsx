@@ -25,6 +25,10 @@ const AdminDashboardPage = ({ onLogout }) => {
           <h2 className="text-xl font-bold mb-2">Manage Services</h2>
           <p>View, add, edit, or delete services</p>
         </Link>
+        <Link to="/admin/professional-services" className="bg-white p-6 rounded-xl shadow-lg text-center hover:bg-brand-indigo/10 transition">
+          <h2 className="text-xl font-bold mb-2">Professional Services</h2>
+          <p>Manage legal, consulting & professional services</p>
+        </Link>
         <Link to="/admin/about" className="bg-white p-6 rounded-xl shadow-lg text-center hover:bg-brand-indigo/10 transition">
           <h2 className="text-xl font-bold mb-2">Manage About</h2>
           <p>Edit About Us page content</p>
@@ -32,6 +36,14 @@ const AdminDashboardPage = ({ onLogout }) => {
         <Link to="/admin/Contact" className="bg-white p-6 rounded-xl shadow-lg text-center hover:bg-brand-indigo/10 transition">
           <h2 className="text-xl font-bold mb-2">Manage Contact</h2>
           <p>Edit Contact Us page content</p>
+        </Link>
+        <Link to="/admin/locations" className="bg-white p-6 rounded-xl shadow-lg text-center hover:bg-brand-indigo/10 transition">
+          <h2 className="text-xl font-bold mb-2">Manage Locations</h2>
+          <p>Edit Locations page content</p>
+        </Link>
+        <Link to="/admin/banner" className="bg-white p-6 rounded-xl shadow-lg text-center hover:bg-brand-indigo/10 transition">
+          <h2 className="text-xl font-bold mb-2">Manage Banner</h2>
+          <p>Edit Banner content</p>
         </Link>
       </div>
     </div>

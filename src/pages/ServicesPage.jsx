@@ -183,7 +183,7 @@ const ServicesPage = () => {
                   className="mt-4 px-5 py-2 text-sm sm:text-base bg-brand-indigo/10 text-brand-indigo font-medium rounded-full hover:bg-brand-indigo hover:text-white transition-all"
                   onClick={() => handleLearnMore(service)}
                 >
-                  Book Now
+                  View Details
                 </button>
               </div>
             ))
@@ -228,7 +228,7 @@ const ServicesPage = () => {
                       className="px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-brand-indigo text-white rounded-full hover:bg-brand-indigoDark transition"
                       onClick={() => handleBookNow(item)}
                     >
-                      Book Now
+                      View Details
                     </button>
                   </div>
                 </div>
