@@ -267,6 +267,34 @@ export const productsAPI = {
     });
     return await handleResponse(response);
   },
+
+  uploadProductImages: async (id, files) => {
+    const formData = new FormData();
+    
+    // Append each file to FormData
+    Array.from(files).forEach(file => {
+      formData.append('images', file);
+    });
+
+    const token = getToken();
+    const response = await fetch(`${API_URL}/products/${id}/images`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // Don't set Content-Type, let browser set it with boundary
+      },
+      body: formData,
+    });
+    return await handleResponse(response);
+  },
+
+  deleteProductImage: async (id, imageIndex) => {
+    const response = await fetch(`${API_URL}/products/${id}/images/${imageIndex}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
 };
 
 /**
@@ -398,6 +426,34 @@ export const servicesAPI = {
       headers: getHeaders(),
     });
 
+    return await handleResponse(response);
+  },
+
+  uploadServiceImages: async (id, files) => {
+    const formData = new FormData();
+    
+    // Append each file to FormData
+    Array.from(files).forEach(file => {
+      formData.append('images', file);
+    });
+
+    const token = getToken();
+    const response = await fetch(`${API_URL}/services/${id}/images`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // Don't set Content-Type, let browser set it with boundary
+      },
+      body: formData,
+    });
+    return await handleResponse(response);
+  },
+
+  deleteServiceImage: async (id, imageIndex) => {
+    const response = await fetch(`${API_URL}/services/${id}/images/${imageIndex}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
     return await handleResponse(response);
   },
 };
@@ -771,6 +827,190 @@ export const locationsAPI = {
   },
 };
 
+// ============================================
+// RENTAL SYSTEM APIs
+// ============================================
+
+/**
+ * Rental API for managing product rentals
+ */
+export const rentalAPI = {
+  // Create a new rental
+  createRental: async (rentalData) => {
+    const response = await fetch(`${API_URL}/rentals`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(rentalData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all user rentals
+  getUserRentals: async () => {
+    const response = await fetch(`${API_URL}/rentals/user`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get rental by ID
+  getRentalById: async (id) => {
+    const response = await fetch(`${API_URL}/rentals/${id}`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Cancel rental
+  cancelRental: async (id, reason) => {
+    const response = await fetch(`${API_URL}/rentals/${id}/cancel`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ reason }),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all rentals (admin)
+  getAllRentals: async () => {
+    const response = await fetch(`${API_URL}/rentals/admin/all`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Update rental status (admin)
+  updateRentalStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/rentals/${id}/status`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    return await handleResponse(response);
+  },
+};
+
+/**
+ * KYC API for managing KYC verification
+ */
+export const kycAPI = {
+  // Get KYC status
+  getKYCStatus: async () => {
+    const response = await fetch(`${API_URL}/kyc/status`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Upload KYC documents
+  uploadKYC: async (formData) => {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/kyc/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData, // FormData for file upload
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all KYC submissions (admin)
+  getAllKYCSubmissions: async () => {
+    const response = await fetch(`${API_URL}/kyc/admin/all`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Verify KYC (admin)
+  verifyKYC: async (id) => {
+    const response = await fetch(`${API_URL}/kyc/${id}/verify`, {
+      method: 'PUT',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Reject KYC (admin)
+  rejectKYC: async (id, reason) => {
+    const response = await fetch(`${API_URL}/kyc/${id}/reject`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ reason }),
+    });
+    return await handleResponse(response);
+  },
+};
+
+/**
+ * Service Request API for maintenance and support requests
+ */
+export const serviceRequestAPI = {
+  // Create service request
+  createServiceRequest: async (requestData) => {
+    const response = await fetch(`${API_URL}/service-requests`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(requestData),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get user's service requests
+  getUserServiceRequests: async () => {
+    const response = await fetch(`${API_URL}/service-requests/user`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get service request by ID
+  getServiceRequestById: async (id) => {
+    const response = await fetch(`${API_URL}/service-requests/${id}`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Cancel service request
+  cancelServiceRequest: async (id) => {
+    const response = await fetch(`${API_URL}/service-requests/${id}/cancel`, {
+      method: 'PUT',
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Get all service requests (admin)
+  getAllServiceRequests: async () => {
+    const response = await fetch(`${API_URL}/service-requests/admin/all`, {
+      headers: getHeaders(),
+    });
+    return await handleResponse(response);
+  },
+
+  // Update service request status (admin)
+  updateServiceRequestStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/service-requests/${id}/status`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    return await handleResponse(response);
+  },
+
+  // Assign service request (admin)
+  assignServiceRequest: async (id, assignedTo) => {
+    const response = await fetch(`${API_URL}/service-requests/${id}/assign`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ assignedTo }),
+    });
+    return await handleResponse(response);
+  },
+};
+
 export default {
   setAuthToken,
   auth: authAPI,
@@ -783,4 +1023,7 @@ export default {
   users: usersAPI,
   banners: bannersAPI,
   locations: locationsAPI,
+  rentals: rentalAPI,
+  kyc: kycAPI,
+  serviceRequests: serviceRequestAPI,
 };

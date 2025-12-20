@@ -14,7 +14,12 @@ export const API_ENDPOINTS = {
   BOOKINGS: '/api/bookings',
   USERS: '/api/users',
   ABOUT: '/api/about',
-  CONTACT: '/api/contact'
+  CONTACT: '/api/contact',
+  
+  // Rental System endpoints
+  RENTALS: '/api/rentals',
+  KYC: '/api/kyc',
+  SERVICE_REQUESTS: '/api/service-requests'
 };
 
 export default {

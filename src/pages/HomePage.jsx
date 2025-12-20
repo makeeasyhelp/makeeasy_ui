@@ -409,7 +409,7 @@ const HomePage = () => {
                                         <h3 className="font-bold text-base text-gray-800 mb-1 line-clamp-1">{service.title}</h3>
                                         <p className="text-xs text-gray-600 mb-3 line-clamp-2">{service.description}</p>
                                         <button className="w-full bg-gradient-to-r from-brand-indigo to-brand-purple text-white py-2 text-xs font-medium rounded-lg hover:shadow-md transition-all duration-300">
-                                            Book Now
+                                            View Details
                                         </button>
                                     </div>
                                 </motion.div>

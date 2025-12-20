@@ -134,6 +134,23 @@ const Header = ({ activePage }) => {
 
           {/* Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3 relative">
+            {/* Rental Cart Icon */}
+            <Link 
+              to="/rental-cart"
+              className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ShoppingCart size={22} className="text-gray-700" />
+              {(() => {
+                const cart = JSON.parse(localStorage.getItem('rentalCart') || '[]');
+                const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+                return itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                );
+              })()}
+            </Link>
+
             {isLoggedIn ? (
               <div
                 className="relative"
@@ -159,6 +176,7 @@ const Header = ({ activePage }) => {
                     >
                       <Link to="/profile" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Profile</Link>
                       <Link to="/orders" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Orders</Link>
+                      <Link to="/user/rentals" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">My Rentals</Link>
                       <Link to="/user-services" className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Your Services</Link>
                       <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>
                     </motion.div>
@@ -174,16 +192,6 @@ const Header = ({ activePage }) => {
                 <User size={18} />
               </button>
             )}
-
-            <button
-              onClick={() => navigate('/cart')}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors relative"
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCart size={18} />
-              {/* Optional: Add a badge for cart items */}
-              {/* <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">3</span> */}
-            </button>
 
             {/* Mobile Toggle */}
             <button
@@ -256,6 +264,7 @@ const Header = ({ activePage }) => {
                     <span className="font-medium">{user?.name}</span>
                   </Link>
                   <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">Orders</Link>
+                  <Link to="/user/rentals" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">My Rentals</Link>
                   <Link to="/user-services" onClick={() => setMobileMenuOpen(false)} className="block w-full py-2 px-3 text-left rounded-md text-base hover:bg-gray-100">Your Services</Link>
                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full mt-2 py-2 text-center rounded-md text-base font-medium bg-red-500 text-white">Logout</button>
                 </>

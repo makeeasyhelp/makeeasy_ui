@@ -163,7 +163,7 @@ const Blog2Page = () => {
                                     </div>
                                     <div className="text-brand-purple font-bold mt-4">₹{item.price}</div>
                                     <button className="mt-4 w-full py-2 bg-brand-purple text-white rounded-lg hover:bg-brand-purpleDark transition-all duration-300">
-                                        Book Now
+                                        View Details
                                     </button>
                                 </div>
                             ))}

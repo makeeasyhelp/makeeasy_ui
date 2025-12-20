@@ -587,7 +587,7 @@ const ProductDetailsPage = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-bold text-brand-purple">₹{item.price}/day</span>
                       <button className="px-3 py-1 text-xs text-brand-indigo border border-brand-indigo rounded-full hover:bg-brand-indigo hover:text-white transition-colors">
-                        View Details
+                        Book Now
                       </button>
                     </div>
                   </div>
